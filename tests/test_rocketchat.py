@@ -82,11 +82,17 @@ def test_channels(api):
     topic = api.channels.setTopic(roomId=channel['_id'], topic='test topic')
     assert topic == 'test topic'
 
+    print('Channel')
+    pprint(channel)
     channel = api.channels.setType(roomId=channel['_id'], type='p')
+    print('After Channel')
+    pprint(channel)
     assert channel['t'] == 'p'
-    time.sleep(5.0)
-    channel = api.channels.setType(roomId=channel['_id'], type='c')
-    assert channel['t'] == 'c'
+
+    group = api.channels.setType(roomId=channel['_id'], type='c')
+    print('Group')
+    pprint(group)
+    assert group['t'] == 'c'
 
     r = api.channels.archive(roomId=channel['_id'])
     assert r == True

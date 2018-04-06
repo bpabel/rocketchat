@@ -1,4 +1,21 @@
-"""Python wrapper for the RocketChat REST API.
+"""Python interface for the RocketChat REST API.
+
+This api attempts to mirror the official REST API as close as possible.  The api names
+and paths should generally match the same names in the REST API.  Each python endpoint
+accepts the same keyword arguments as the REST API.  No attempt has been made to codify
+the argument order for each method, so only keyword arguments should be used.
+
+There are a few exceptions to these guidelines:
+
+When the REST api uses the same endpoint with different HTTP methods, like
+settings.GET and settings.POST, this api will use appropriate names to
+differentiate between the different uses of the same api endpoint.
+
+In cases where the API has a variable endpoint (i.e. where a portion of the endpoint is based
+on a variable), the api method will accept a single positional argument (in addition to the
+keyword arguments) that will be appended to the api path to create the full endpoint.
+
+
 
 >>> from rocketchat import RocketChat
 >>> api = RocketChat('http://server.com', 'username', 'password')
@@ -10,8 +27,9 @@
 
 
 """
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 from pprint import pprint
+import inspect
 import json
 
 import requests
@@ -22,26 +40,50 @@ class RocketChatError(Exception):
     def __init__(self, errorType, error):
         self.errorType = errorType
         self.error = error
-        message = '{}: {}'.format(errorType, error)
-        super(RocketChatError, self).__init__(message)
+        super(RocketChatError, self).__init__(error)
 
 
 class APIPath(object):
     """Descriptor object for defining RocketChat API calls.
 
-
     """
 
     def __init__(self, path, method='GET', arg_endpoint=False, result_key=None):
+        """
+
+        :param path: API endpoint (e.g. users.create)
+        :param method: HTTP method (e.g. GET, POST, DELETE).  If None is given, this will not
+            be a valid endpoint and will raise an error if called as one.
+        :param arg_endpoint: If True, this APIPath will accept a single positional argument that
+            will be added to the api path with a preceding slash to create the final
+            endpoint. (e.g. api.settings.get('ARG') -> /settings/ARG
+        :param result_key: A specific key in the returned json object that should be returned
+            instead of the entire json response object.
+        """
         self._path = path
         self._method = method
         self._arg_endpoint = arg_endpoint
         self._result_key = result_key
         self._api = None
 
+    def __str__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self._path))
+
+    def __repr__(self):
+        args = inspect.getargspec(self.__init__).args[1:]
+        attrs = ['{}={}'.format(arg, repr(getattr(self, '_' + arg))) for arg in args]
+        return '{}({})'.format(self.__class__.__name__, ', '.join(attrs))
+
     def _propagate_api(self):
-        for name in dir(self):
-            attr = getattr(self, name)
+        """Propogate the RocketChat api class down to all sublevel api calls.
+
+        Since only the top level APIPath definitions are class attributes (the sublevel
+        APIPath definitions are instance attributes on the top level APIPath definitions),
+        only the top level APIPath's will receive a __get__ call from the API instance.
+        This will pass the api instance down to all child APIPaths.
+
+        """
+        for name, attr in self.__dict__.items():
             if isinstance(attr, APIPath):
                 attr._api = self._api
                 attr._propagate_api()
@@ -53,7 +95,7 @@ class APIPath(object):
         return self
 
     def __set__(self, obj, value):
-        return None
+        raise AttributeError('APIPaths are read-only')
 
     def _url(self, path):
         return self._api.url + self._api.api_v1_path + path
@@ -81,7 +123,6 @@ class APIPath(object):
             data=data, 
             headers=headers,
             )
-        r.raise_for_status()
         try:        
             result = r.json()
         except Exception:
@@ -99,8 +140,7 @@ class APIPath(object):
 
 
 class RocketChat(object):
-    """
-
+    """Python interface to the RocketChat REST API.
 
     """
     
@@ -162,7 +202,7 @@ class RocketChat(object):
     groups.setPurpose = APIPath('groups.setPurpose', 'POST')
     groups.setReadOnly = APIPath('groups.setReadOnly', 'POST')
     groups.setTopic = APIPath('groups.setTopic', 'POST')
-    groups.setType = APIPath('groups.setType', 'POST')
+    groups.setType = APIPath('groups.setType', 'POST', result_key='group')
     groups.unarchive = APIPath('groups.unarchive', 'POST')
 
     chat = APIPath('chat', None)
@@ -214,7 +254,11 @@ class RocketChat(object):
     def _url(self, path):
         return self.url + self.api_v1_path + path
 
-    def login(self):
+    def login(self, username=None, password=None):
+        if username is not None:
+            self.username = username
+        if password is not None:
+            self.password = password
         data = {'username': self.username, 'password': self.password}
         r = requests.post(self._url('login'), data=data)
         j = r.json()
