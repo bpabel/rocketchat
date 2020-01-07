@@ -1,0 +1,26 @@
+
+
+[build-system]
+requires = ["flit_core >=2,<3"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "rocketchat"
+dist-name = "rocketchat-api"
+author = "Brendan Abel"
+author-email = "007brendan@gmail.com"
+home-page = "https://github.com/bpabel/rocketchat"
+description-file = "README.md"
+requires-python = ">=2.7"
+requires = ["requests >=2,<3"]
+keywords = "rocketchat,chat"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest",
+    "mock",
+]
+doc = ["sphinx"]
