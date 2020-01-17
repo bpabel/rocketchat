@@ -336,6 +336,7 @@ class RocketChat(object):
     validateInviteToken = APIPath("validateInviteToken", "POST")
 
     livechat = APIPath("livechat", None)
+    livechat.inquiries = APIPath("livechat/inquiries", None)
     livechat.inquiries.list = APIPath("livechat/inquiries.list")
     livechat.inquiries.take = APIPath("livechat/inquiries.take", "POST")
     livechat.rooms = APIPath("livechat/rooms")
