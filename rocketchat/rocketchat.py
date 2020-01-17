@@ -168,14 +168,14 @@ class RocketChat(object):
     assets.unsetAsset = APIPath("assets.unsetAsset", "POST", result_key="success")
 
     autotranslate = APIPath("autotranslate", None)
-    autotranslate.getSupportedLanguages("autotranslate.getSupportedLanguages", result_key="languages")
-    autotranslate.saveSettings("autotranslate.saveSettings", "POST", result_key="success")
-    autotranslate.translateMessage("autotranslate.translateMessage", "POST", result_key="message")
+    autotranslate.getSupportedLanguages = APIPath("autotranslate.getSupportedLanguages", result_key="languages")
+    autotranslate.saveSettings =  APIPath("autotranslate.saveSettings", "POST", result_key="success")
+    autotranslate.translateMessage = APIPath("autotranslate.translateMessage", "POST", result_key="message")
 
     logout = APIPath("logout", "POST")
 
     users = APIPath("users", None)
-    users.presence("users.presence")
+    users.presence = APIPath("users.presence")
     users.create = APIPath("users.create", "POST", result_key="user")
     users.createToken = APIPath("users.createToken", "POST", result_key="data")
     users.delete = APIPath("users.delete", "POST", result_key="success")
@@ -189,7 +189,7 @@ class RocketChat(object):
     users.getUsernameSuggestion = APIPath("users.getUsernameSuggestion", "GET")
     users.info = APIPath("users.info", "GET", result_key="user")
     users.list = APIPath("users.list", "GET")
-    users.regeneratePersonalAccessToken("users.regeneratePersonalAccessToken", "POST")
+    users.regeneratePersonalAccessToken = APIPath("users.regeneratePersonalAccessToken", "POST")
     users.register = APIPath("users.register", "POST", result_key="user")
     users.removePersonalAccessToken = APIPath("users.removePersonalAccessToken", "POST")
     users.requestDataDownload = APIPath("users.requestDataDownload")
@@ -213,7 +213,7 @@ class RocketChat(object):
     channels.create = APIPath("channels.create", "POST", result_key="channel")
     channels.delete = APIPath("channels.delete", "POST")
     channels.files = APIPath("channels.files")
-    channels.getAllUserMentionsByChannel("channels.getAllUserMentionsByChannel")
+    channels.getAllUserMentionsByChannel = APIPath("channels.getAllUserMentionsByChannel")
     channels.getIntegrations = APIPath(
         "channels.getIntegrations", "GET", result_key="integrations"
     )
