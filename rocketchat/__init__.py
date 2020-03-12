@@ -1,6 +1,6 @@
 """Python interface for the RocketChat REST API.
 
-This api attempts to mirror the official REST API as close as possible.  The api names
+This api attempts to mirror the official REST API as closely as possible.  The api names
 and paths should generally match the same names in the REST API.  Each python endpoint
 accepts the same keyword arguments as the REST API.  No attempt has been made to codify
 the argument order for each method, so only keyword arguments should be used.
