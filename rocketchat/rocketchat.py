@@ -20,7 +20,7 @@ class RocketChat(object):
         self.api_v1_path = "/api/v1/"
         self.user_id = None
         self.auth_token = None
-        self.login()
+        self.login(username=username, password=password)
 
         # fmt:off
         self.me = APIPath(self, "me")
